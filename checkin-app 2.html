@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>🎟️ تسجيل الدخول</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:Tahoma,'Segoe UI',Arial,sans-serif;background:#0f0a1e;min-height:100vh;color:#fff;}
+
+.hdr{background:linear-gradient(135deg,#7c3aed,#a855f7,#d946ef);padding:16px 20px 14px;position:sticky;top:0;z-index:50;}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.hdr h1{font-size:17px;font-weight:700;}
+.stats-row{display:flex;gap:8px;}
+.stag{background:rgba(255,255,255,0.2);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;}
+
+/* Search */
+.search-wrap{padding:12px 14px;background:#1a1035;border-bottom:1px solid #3b1f6e;position:sticky;top:72px;z-index:40;}
+.search-box{display:flex;gap:8px;align-items:center;}
+#searchIn{flex:1;background:#0f0a1e;border:2px solid #3b1f6e;border-radius:12px;padding:12px 14px;font-size:16px;color:#fff;font-family:inherit;outline:none;}
+#searchIn:focus{border-color:#a855f7;}
+#searchIn::placeholder{color:#4b5563;}
+.clear-btn{background:#3b1f6e;border:none;border-radius:10px;padding:12px 14px;color:#fff;font-size:16px;cursor:pointer;}
+
+/* Scan hint */
+.scan-hint{background:#1f1040;border-bottom:1px solid #3b1f6e;padding:9px 14px;font-size:12px;color:#9ca3af;text-align:center;}
+.scan-hint b{color:#a855f7;}
+
+/* Guest list */
+.list{padding:10px 14px;padding-bottom:100px;}
+
+.guest-card{background:#1a1035;border:1px solid #3b1f6e;border-radius:16px;margin-bottom:10px;overflow:hidden;transition:.15s;}
+.guest-card.checked{border-color:#22c55e;background:#052e16;}
+.guest-card.highlight{border-color:#f59e0b;background:#1c1a00;}
+
+.gc-top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;}
+.gc-info{flex:1;}
+.gc-name{font-size:16px;font-weight:700;margin-bottom:3px;}
+.gc-sub{font-size:12px;color:#6b7280;}
+.gc-sub.checked{color:#86efac;}
+
+.check-btn{width:48px;height:48px;border-radius:50%;border:none;font-size:20px;cursor:pointer;font-family:inherit;flex-shrink:0;transition:.15s;}
+.check-btn.in{background:#166534;color:#86efac;}
+.check-btn.out{background:#1f2937;color:#6b7280;}
+.check-btn.out:active{background:#7c3aed;transform:scale(.92);}
+
+.gc-time{background:#0f0a1e;padding:8px 16px;font-size:12px;color:#86efac;border-top:1px solid #166534;}
+
+/* Toast */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);border-radius:16px;padding:14px 22px;font-size:15px;font-weight:700;text-align:center;z-index:200;min-width:220px;opacity:0;transition:opacity .3s;pointer-events:none;}
+.toast.show{opacity:1;}
+.toast.ok{background:#166534;border:2px solid #22c55e;color:#86efac;}
+.toast.already{background:#7c2d12;border:2px solid #f97316;color:#fed7aa;}
+.toast.err{background:#7f1d1d;border:2px solid #ef4444;color:#fca5a5;}
+
+/* Import overlay */
+.overlay{position:fixed;inset:0;background:#0f0a1e;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;}
+.imp-card{background:#1a1035;border:1px solid #3b1f6e;border-radius:24px;padding:28px 24px;text-align:center;max-width:360px;width:100%;}
+.imp-card h2{font-size:17px;color:#e9d5ff;margin-bottom:8px;}
+.imp-card p{font-size:13px;color:#9ca3af;line-height:1.7;margin-bottom:20px;}
+.fbtn{display:inline-block;background:#7c3aed;color:#fff;border-radius:12px;padding:13px 24px;font-size:15px;font-weight:700;border:none;font-family:inherit;cursor:pointer;}
+.sbtn{display:block;width:100%;background:#22c55e;color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:14px;}
+.prev{background:#0f0a1e;border-radius:12px;padding:10px;margin-top:14px;max-height:150px;overflow-y:auto;text-align:right;}
+.pr{padding:7px 4px;border-bottom:1px solid #1f1040;font-size:13px;display:flex;justify-content:space-between;}
+.pr:last-child{border-bottom:none;}
+
+/* Bottom bar */
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#1a1035;border-top:1px solid #3b1f6e;padding:12px 14px;display:flex;gap:8px;}
+.reset-btn{flex:1;background:#1f1040;color:#9ca3af;border:1px solid #3b1f6e;border-radius:12px;padding:11px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;}
+.export-btn{flex:1;background:#7c3aed;color:#fff;border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;}
+
+.hidden{display:none!important;}
+.empty{text-align:center;padding:40px 20px;color:#4b5563;font-size:14px;}
+</style>
+</head>
+<body>
+
+<!-- Import overlay -->
+<div id="impOv" class="overlay">
+  <div class="imp-card">
+    <div style="font-size:44px;margin-bottom:12px">🎟️</div>
+    <h2>تسجيل دخول الضيوف</h2>
+    <p>ارفعي نفس ملف CSV تبع البطاقات</p>
+    <input type="file" accept=".csv" id="csvIn" class="hidden">
+    <button class="fbtn" onclick="document.getElementById('csvIn').click()">📂 ارفعي ملف CSV</button>
+    <div id="prev" class="prev hidden"></div>
+    <button class="sbtn hidden" id="sbtn" onclick="startApp()">✅ ابدئي</button>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="hdr hidden" id="hdr">
+  <div class="hdr-top">
+    <h1>🎟️ تسجيل الدخول</h1>
+    <div class="stats-row">
+      <div class="stag">✅ <span id="sIn">0</span></div>
+      <div class="stag">⏳ <span id="sWt">0</span></div>
+      <div class="stag">👥 <span id="sTot">0</span></div>
+    </div>
+  </div>
+  <!-- Search -->
+  <div style="display:flex;gap:8px;align-items:center;">
+    <input id="searchIn" type="search" placeholder="🔍 ابحثي عن اسم أو كود مثل G001..." oninput="doSearch()" autocomplete="off" autocorrect="off" spellcheck="false">
+    <button class="clear-btn" onclick="clearSearch()">✕</button>
+  </div>
+</div>
+
+<div class="scan-hint hidden" id="hint">
+  افتحي كاميرا الجوال → صوّري QR البطاقة → يظهر <b>الكود</b> → اكتبيه هنا أو ابحثي بالاسم
+</div>
+
+<!-- List -->
+<div class="list hidden" id="listWrap">
+  <div id="gList"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Bottom bar -->
+<div class="bottom hidden" id="btm">
+  <button class="reset-btn" onclick="resetApp()">🔄 تغيير القائمة</button>
+  <button class="export-btn" onclick="exportReport()">📊 تصدير التقرير</button>
+</div>
+
+<script>
+var guests=[], toastTimer;
+
+document.getElementById('csvIn').addEventListener('change',function(e){
+  var f=e.target.files[0]; if(!f) return;
+  Papa.parse(f,{header:true,skipEmptyLines:true,complete:function(r){
+    var ks=r.meta.fields||[];
+    var nk=ks.find(function(k){return /name|اسم|ism/i.test(k);})||ks[0];
+    var pk=ks.find(function(k){return /phone|رقم|tel|mob|جوال/i.test(k);})||ks[1];
+    guests=[];
+    r.data.forEach(function(row,i){
+      var nm=(row[nk]||'').trim(); if(!nm) return;
+      guests.push({name:nm,phone:(row[pk]||'').trim(),checkedIn:false,time:null,code:'G'+String(i+1).padStart(3,'0'),idx:i});
+    });
+    var pv=document.getElementById('prev');
+    pv.innerHTML=guests.slice(0,5).map(function(g){
+      return '<div class="pr"><span>'+g.name+'</span><span style="color:#a855f7;font-size:11px">'+g.code+'</span></div>';
+    }).join('')+(guests.length>5?'<div class="pr" style="justify-content:center;color:#6b7280">+ '+(guests.length-5)+' أخريات</div>':'');
+    pv.classList.remove('hidden');
+    var sb=document.getElementById('sbtn'); sb.classList.remove('hidden');
+    sb.textContent='✅ ابدئي ('+guests.length+' ضيفة)';
+  }});
+});
+
+function startApp(){
+  document.getElementById('impOv').classList.add('hidden');
+  ['hdr','hint','listWrap','btm'].forEach(function(id){document.getElementById(id).classList.remove('hidden');});
+  updateStats(); renderList();
+  setTimeout(function(){document.getElementById('searchIn').focus();},300);
+}
+
+function resetApp(){
+  guests=[];
+  ['hdr','hint','listWrap','btm'].forEach(function(id){document.getElementById(id).classList.add('hidden');});
+  document.getElementById('impOv').classList.remove('hidden');
+  document.getElementById('prev').classList.add('hidden');
+  document.getElementById('sbtn').classList.add('hidden');
+  document.getElementById('csvIn').value='';
+  document.getElementById('searchIn').value='';
+}
+
+function doSearch(){
+  renderList();
+}
+
+function clearSearch(){
+  document.getElementById('searchIn').value='';
+  renderList();
+  document.getElementById('searchIn').focus();
+}
+
+function renderList(){
+  var q=(document.getElementById('searchIn').value||'').trim().toLowerCase();
+  var filtered=guests.filter(function(g){
+    if(!q) return true;
+    return g.name.toLowerCase().includes(q)||g.code.toLowerCase().includes(q)||(g.phone&&g.phone.includes(q));
+  });
+  // sort: not checked first, then checked
+  filtered.sort(function(a,b){
+    if(a.checkedIn&&!b.checkedIn) return 1;
+    if(!a.checkedIn&&b.checkedIn) return -1;
+    return 0;
+  });
+  if(!filtered.length){
+    document.getElementById('gList').innerHTML='<div class="empty">ما في نتائج 🔍</div>';
+    return;
+  }
+  document.getElementById('gList').innerHTML=filtered.map(function(g){
+    return '<div class="guest-card'+(g.checkedIn?' checked':'')+(isHighlight(g,q)?' highlight':'')+'" id="gc'+g.idx+'">'+
+      '<div class="gc-top">'+
+        '<div class="gc-info">'+
+          '<div class="gc-name">'+g.name+'</div>'+
+          '<div class="gc-sub'+(g.checkedIn?' checked':'')+'">'+g.code+(g.phone?' • '+g.phone:'')+'</div>'+
+        '</div>'+
+        '<button class="check-btn '+(g.checkedIn?'in':'out')+'" onclick="toggleGuest('+g.idx+')" '+
+          'title="'+(g.checkedIn?'إلغاء الدخول':'تسجيل الدخول')+'">'+
+          (g.checkedIn?'✓':'○')+'</button>'+
+      '</div>'+
+      (g.checkedIn&&g.time?'<div class="gc-time">⏰ دخلت الساعة '+g.time+'</div>':'')+
+    '</div>';
+  }).join('');
+}
+
+function isHighlight(g,q){
+  if(!q) return false;
+  return g.code.toLowerCase()===q||g.name.toLowerCase()===q;
+}
+
+function toggleGuest(idx){
+  var g=guests[idx];
+  if(g.checkedIn){
+    // undo
+    g.checkedIn=false; g.time=null;
+    showToast('تم إلغاء دخول '+g.name,'err');
+  } else {
+    g.checkedIn=true;
+    var now=new Date();
+    g.time=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+    showToast('✅ أُذِن لها بالدخول\n'+g.name,'ok');
+    if(navigator.vibrate) navigator.vibrate(100);
+  }
+  updateStats(); renderList();
+}
+
+function updateStats(){
+  var ic=guests.filter(function(g){return g.checkedIn;}).length;
+  document.getElementById('sIn').textContent=ic;
+  document.getElementById('sWt').textContent=guests.length-ic;
+  document.getElementById('sTot').textContent=guests.length;
+}
+
+function showToast(msg,type){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type+' show';
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){t.className='toast';},2200);
+}
+
+function exportReport(){
+  var lines=['الاسم,الكود,الحالة,وقت الدخول,الجوال'];
+  guests.forEach(function(g){
+    lines.push(g.name+','+g.code+','+(g.checkedIn?'حضرت':'لم تحضر')+','+(g.time||'-')+','+(g.phone||'-'));
+  });
+  var blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url; a.download='تقرير_الحضور.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
